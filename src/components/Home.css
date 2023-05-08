@@ -1,0 +1,11 @@
+.my-card-deck {
+  margin: 10px;
+}
+.cards-container {
+  background-color: rgb(255, 255, 255);
+  transition: background-color 0.5s ease-in-out;
+}
+.cards-container:hover {
+  background-color: rgba(82, 80, 80, 0.356);
+  backdrop-filter: blur(10px);
+}
