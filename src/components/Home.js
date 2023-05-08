@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+//eslint-disable
+
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Card,
   Row,
@@ -26,59 +28,62 @@ const Home = ({ PaginationData }) => {
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  const fetchData = useCallback(
+    async (page) => {
+      if (!filterValue && !isLatestPosts) {
+        try {
+          const response = await axiosConfig(
+            `/search?tags=front_page&page=${page}`
+          );
+
+          setData(response.data.hits);
+          setTotalPages(response.data.nbPages);
+          setIsLoading(false);
+          setFilterValue("");
+          setIsLatestPosts(false);
+        } catch (error) {
+          setIsError(true);
+          setErrorMessage(error.message);
+          console.log(error.message);
+        }
+      } else if (filterValue) {
+        try {
+          const response = await axiosConfig.get(
+            `/search?query=${filterValue}&tags=story&page=${page}`
+          );
+
+          setData(response.data.hits);
+          setTotalPages(response.data.nbPages);
+          setIsLoading(false);
+          setIsLatestPosts(false);
+        } catch (error) {
+          setIsError(true);
+          setErrorMessage(error.message);
+          console.log(error);
+        }
+      } else if (isLatestPosts && !filterValue) {
+        try {
+          const response = await axiosConfig.get(
+            `/search_by_date?tags=story&page=${page}`
+          );
+
+          setData(response.data.hits);
+          setTotalPages(response.data.nbPages);
+          setIsLoading(false);
+          setFilterValue("");
+        } catch (error) {
+          setIsError(true);
+          setErrorMessage(error.message);
+          console.log(error);
+        }
+      }
+    },
+    [filterValue, isLatestPosts]
+  );
+
   useEffect(() => {
     fetchData(currentPage);
-  }, [filterValue, currentPage, isLatestPosts]);
-
-  const fetchData = async (page) => {
-    if (!filterValue && !isLatestPosts) {
-      try {
-        const response = await axiosConfig(
-          `/search?tags=front_page&page=${page}`
-        );
-
-        setData(response.data.hits);
-        setTotalPages(response.data.nbPages);
-        setIsLoading(false);
-        setFilterValue("");
-        setIsLatestPosts(false);
-      } catch (error) {
-        setIsError(true);
-        setErrorMessage(error.message);
-        console.log(error.message);
-      }
-    } else if (filterValue) {
-      try {
-        const response = await axiosConfig.get(
-          `/search?query=${filterValue}&tags=story&page=${page}`
-        );
-
-        setData(response.data.hits);
-        setTotalPages(response.data.nbPages);
-        setIsLoading(false);
-        setIsLatestPosts(false);
-      } catch (error) {
-        setIsError(true);
-        setErrorMessage(error.message);
-        console.log(error);
-      }
-    } else if (isLatestPosts && !filterValue) {
-      try {
-        const response = await axiosConfig.get(
-          `/search_by_date?tags=story&page=${page}`
-        );
-
-        setData(response.data.hits);
-        setTotalPages(response.data.nbPages);
-        setIsLoading(false);
-        setFilterValue("");
-      } catch (error) {
-        setIsError(true);
-        setErrorMessage(error.message);
-        console.log(error);
-      }
-    }
-  };
+  }, [filterValue, currentPage, isLatestPosts, fetchData]);
 
   const handleFilterChange = (event) => {
     setFilterValue(event.target.value);
