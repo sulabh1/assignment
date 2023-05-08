@@ -21,17 +21,17 @@ const Home = ({ PaginationData }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [filterValue, setFilterValue] = useState("");
-  const [latestPosts, setLatestPosts] = useState(false);
+  const [isLatestPosts, setIsLatestPosts] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     fetchData(currentPage);
-  }, [filterValue, currentPage, latestPosts]);
+  }, [filterValue, currentPage, isLatestPosts]);
 
   const fetchData = async (page) => {
-    if (!filterValue && !latestPosts) {
+    if (!filterValue && !isLatestPosts) {
       try {
         const response = await axiosConfig(
           `/search?tags=front_page&page=${page}`
@@ -41,9 +41,9 @@ const Home = ({ PaginationData }) => {
         setTotalPages(response.data.nbPages);
         setIsLoading(false);
         setFilterValue("");
-        setLatestPosts(false);
+        setIsLatestPosts(false);
       } catch (error) {
-        setError(true);
+        setIsError(true);
         setErrorMessage(error.message);
         console.log(error.message);
       }
@@ -56,13 +56,13 @@ const Home = ({ PaginationData }) => {
         setData(response.data.hits);
         setTotalPages(response.data.nbPages);
         setIsLoading(false);
-        setLatestPosts(false);
+        setIsLatestPosts(false);
       } catch (error) {
-        setError(true);
+        setIsError(true);
         setErrorMessage(error.message);
         console.log(error);
       }
-    } else if (latestPosts && !filterValue) {
+    } else if (isLatestPosts && !filterValue) {
       try {
         const response = await axiosConfig.get(
           `/search_by_date?tags=story&page=${page}`
@@ -73,7 +73,7 @@ const Home = ({ PaginationData }) => {
         setIsLoading(false);
         setFilterValue("");
       } catch (error) {
-        setError(true);
+        setIsError(true);
         setErrorMessage(error.message);
         console.log(error);
       }
@@ -90,19 +90,19 @@ const Home = ({ PaginationData }) => {
   const setLatestPost = (e) => {
     e.preventDefault();
 
-    setLatestPosts(!latestPosts);
+    setIsLatestPosts(!isLatestPosts);
   };
 
   if (isLoading) {
     return <Preloader />;
   }
 
-  if (error) {
+  if (isError) {
     return <h1 style={{ color: "ff9494" }}>{errorMessage}</h1>;
   }
   if (!data.length) {
-    setError(true);
-    setErrorMessage("404: Data is empty");
+    setIsError(true);
+    setErrorMessage("404: Data is empty reload to see the popular data.");
   }
 
   return (
@@ -117,12 +117,13 @@ const Home = ({ PaginationData }) => {
           />
         </FormGroup>
       </Form>
+      Click to see latest and popular posts{" "}
       <ButtonGroup>
         <Button
-          variant={latestPosts ? "primary" : "secondary"}
+          variant={isLatestPosts ? "primary" : "secondary"}
           onClick={setLatestPost}
         >
-          {latestPosts ? "Latest Posts" : "Popular Posts"}
+          {isLatestPosts ? "Latest Posts" : "Popular Posts"}
         </Button>
       </ButtonGroup>
       <div className="d-inline-flex">

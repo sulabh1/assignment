@@ -3,7 +3,7 @@ import { Pagination } from "react-bootstrap";
 
 const PaginationData = ({ currentPage, totalPages, onPageChange }) => {
   const pageItems = [];
-  const numPagesToShow = 5;
+  const numPagesToShow = 10;
   const firstPage = Math.max(currentPage - Math.floor(numPagesToShow / 2), 1);
   const lastPage = Math.min(firstPage + numPagesToShow - 1, totalPages);
 
@@ -21,6 +21,7 @@ const PaginationData = ({ currentPage, totalPages, onPageChange }) => {
 
   return (
     <Pagination>
+      <Pagination.First onClick={() => onPageChange(1)} />
       <Pagination.Prev
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
@@ -30,6 +31,7 @@ const PaginationData = ({ currentPage, totalPages, onPageChange }) => {
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
       />
+      <Pagination.Last onClick={() => onPageChange(totalPages)} />
     </Pagination>
   );
 };
